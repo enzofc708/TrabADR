@@ -147,7 +147,8 @@ lines(seq(-150,50,by=.5), dnorm(seq(-150,50,by=.5), mean=mean(arq_atl$Longitude)
 # curva normal com média e variância iguais a da distribuição real.
 
 # Com esses modelos construídos, podemos criar uma função capaz de gerar um 
-# furacão genérico
+# furacão genérico através do Método de Monte Carlo, ou seja, através de 
+# uma média entre múltiplas simulações.
 
 geraFuracaoMonteCarlo <- function(n=1){
   maxWind <- rtriangle(n,10,130,25)
@@ -159,20 +160,25 @@ geraFuracaoMonteCarlo <- function(n=1){
   return(furacao)
 }
 
-# Previsão de Furacões em um período via TCL
-previsaoFuracoesTCL <- function(anos = 10, iter=1){
-  mi_z <- anos * 950 / 3
-  sigma2_z <- anos * 452500 / 18
-  z <- rnorm(iter, mean = mi_z, sd = sqrt(sigma2_z))
-  return(mean(z))
-}
+# Além disso, podemos rodar uma previsão do número de furacões em um dado número
+# de anos. Isso pode ser feito de duas formas:
+# 1 - Através da soma de N simulações anuais de furacões. 
+# 2 - Através do uso do Teorema Central do Limite.
 
-# Previsão de Furacões em um período via soma
+# Método 1 - Previsão de Furacões em um período via soma
 previsaoFuracoes <- function(anos = 10, iter=1){
   sims <- numeric()
   for (i in 1:iter) {
     z <- sum(rtriangle(anos, 0, 750, 200))
     sims <- append(sims, z)
   }
+  return(mean(z))
+}
+
+# Método 2 - Previsão de Furacões em um período via TCL
+previsaoFuracoesTCL <- function(anos = 10, iter=1){
+  mi_z <- anos * 950 / 3 # soma de N variáveis aleatórias com mesma média
+  sigma2_z <- anos * 452500 / 18# soma de N variáveis aleatórias com mesma var
+  z <- rnorm(iter, mean = mi_z, sd = sqrt(sigma2_z))
   return(mean(z))
 }
