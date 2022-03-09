@@ -12,7 +12,7 @@
 # furacões ocorridos entre os anos de 1851 e 2015, disponibilizados pela NHC
 # (National Hurricane Center).
 
-# 1) Preparando o Experimento
+# Parte 1) Preparando o Experimento
 
 # Importando o pacote "triangle" para simularmos distribuições triangulares
 
@@ -24,7 +24,7 @@ arq_atl = read.csv("atlantic.csv")
 arq_atl$Date = as.Date(as.character(arq_atl$Date), "%Y%m%d") # Transformando as
                                                              # datas para o R
 
-# 2) Analisando as distribuições de Probabilidade
+# Parte 2) Analisando as distribuições de Probabilidade
 
 # Para gerar nossos modelos de previsão, pegamos alguns atributos do nosso
 # conjunto de dados e tentamos aproximar graficamente por uma distribuição
@@ -182,3 +182,61 @@ previsaoFuracoesTCL <- function(anos = 10, iter=1){
   z <- rnorm(iter, mean = mi_z, sd = sqrt(sigma2_z))
   return(mean(z))
 }
+
+# Parte 3) Casos de Teste
+
+# Como casos de teste, iremos analisar as funções anteriores, que foram criadas
+# com base nos experimentos feitos com os dados reais. 
+
+# Experimento 1 - Furacão "médio"
+# Através do método de Monte Carlo, iremos simular várias vezes a geração dos
+# parâmetros acima para tentar descobrir os parâmetros mais comuns de um 
+# furacão.
+print("")
+print("Experimentos:")
+print("")
+print("Furacão Médio:")
+print(geraFuracaoMonteCarlo(n=10000))
+
+# Experimento 2 - Validação do TCL
+# Nesse experimento, iremos demonstrar o poder do Teorema Central do Limite, 
+# simulando a soma do número de furacões registrados em um período dado de anos
+# via TCL e via soma de N simulações.
+print("")
+print("Tabela Comparativa TCL/Soma:")
+tabelaComp <- matrix(c(previsaoFuracoes(iter=10000), previsaoFuracoesTCL(iter=10000),
+                       previsaoFuracoes(anos=50, iter=10000), previsaoFuracoesTCL(anos=50, iter=10000),
+                       previsaoFuracoes(anos=100, iter=10000), previsaoFuracoesTCL(anos=100, iter=10000)),
+                     nrow = 3, byrow = T, dimnames = list(
+                       c("10 anos", "50 anos", "100 anos"),c("Soma","TCL")))
+print(tabelaComp)
+
+# Experimento 3 - Relatório Anual de FUracões
+# Podemos combinar os experimentos anteriores e prever não só o número de 
+# furacões em um ano, mas também suas características.
+relatorio <- data.frame()
+numFuracoes <- round(previsaoFuracoes(anos=1))
+for(i in 1:numFuracoes){
+  relatorio <- rbind(relatorio, geraFuracaoMonteCarlo(1))
+}
+names(relatorio) <- c("Maximum.Wind", "Minimum.Pressure", "Latitude", "Longitude")
+print("")
+print("Relatório Anual de furacões:")
+print(relatorio)
+
+# Parte 4) Conclusões
+
+# Esse trabalho possibilitou ao grupo uma compreensão mais branda sobre o 
+# conteúdo dado em aula, visto que tivemos a liberdade de não só escolher um
+# tema, mas também de fazer os experimentos que julgássemos mais relevantes.
+# Dentre os conceitos visto em aula, os que mais contribuíram para esse trabalho
+# foram as distribuições de probabilidade vistas, sobretudo a normal e a 
+# triangular e o Teorema Central do Limite. Inicialmente, havia um forte 
+# interesse do grupo em calcular possíveis riscos financeiros advindos dos
+# ataques de furacão, porém essa previsão rapidamente se mostrou inviável,
+# pois os modelos de predição utilizados para tal fim envolvem resolução de 
+# equações diferenciais e dependem de dados sócio-geográficos sobre os locais
+# costeiros atingidos por esse fenômenos. Mesmo assim, a aplicação dos temas
+# visto em aula foi extremamente útil e satisfatória, e todos os membros do
+# grupo se sentem seguros para aplicar alguns conceitos cobertos pela 
+# disciplina e se aprofundar em outras matérias.
